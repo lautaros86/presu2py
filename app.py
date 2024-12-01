@@ -1,10 +1,10 @@
 from flask import Flask, request, jsonify
 from twilio.rest import Client
-import config
+import os
 
 app = Flask(__name__)
 
-client = Client(config.TWILIO_ACCOUNT_SID, config.TWILIO_AUTH_TOKEN)
+client = Client(os.getenv('TWILIO_ACCOUNT_SID'), os.getenv('TWILIO_AUTH_TOKEN'))
 
 @app.route("/webhook", methods=['POST'])
 def webhook():
@@ -13,13 +13,13 @@ def webhook():
     from_number = request.form.get('From', '')
 
     # Responder con un mensaje
-    response_msg = "Hi, how can I help you?"
+    response_msg = "Hi, how can I help you? 3"
 
     # Enviar respuesta
     message = client.messages.create(
         body=response_msg,
-        from_=config.TWILIO_PHONE_NUMBER,
-        to=from_number
+        from_=os.getenv('TWILIO_PHONE_NUMBER'),
+        to=os.getenv('WHATSAPP_PHONE_NUMBER')
     )
 
     return jsonify({'status': 'Message sent'}), 200
