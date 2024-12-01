@@ -13,7 +13,7 @@ def webhook():
     from_number = request.form.get('From', '')
 
     # Responder con un mensaje
-    response_msg = "Hi, how can I help you? 3"
+    response_msg = incoming_msg #"Hi, how can I help you? 3"
 
     # Enviar respuesta
     message = client.messages.create(
@@ -23,6 +23,24 @@ def webhook():
     )
 
     return jsonify({'status': 'Message sent'}), 200
+
+# Nuevo endpoint para manejar status callbacks
+@app.route("/status-callback", methods=['POST'])
+def status_callback():
+    print("Status callback recibido")
+    # Obtener datos del callback
+    message_sid = request.form.get('MessageSid')
+    message_status = request.form.get('MessageStatus')
+    error_code = request.form.get('ErrorCode')
+    error_message = request.form.get('ErrorMessage')
+
+    # Aquí puedes procesar los datos como desees
+    # Por ejemplo, registrar en logs o base de datos
+   # app.logger.info(f"SID: {message_sid}, Status: {message_status}, Error Code: {error_code}, Error Message: {error_message}")
+    print(f"SID: {message_sid}, Status: {message_status}, Error Code: {error_code}, Error Message: {error_message}")
+
+    return '', 204  # Responder con 204 No Content
+
 
 if __name__ == "__main__":
     app.run(debug=True)
