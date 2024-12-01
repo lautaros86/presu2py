@@ -73,4 +73,5 @@ coverage.xml
 
 # Local project settings
 local_settings.py
-presuAI
+.idea
+.idea/
