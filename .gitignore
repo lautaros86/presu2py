@@ -74,3 +74,4 @@ coverage.xml
 # Local project settings
 local_settings.py
 .idea
+.idea/
