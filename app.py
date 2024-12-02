@@ -1,7 +1,11 @@
 from flask import Flask, request, jsonify
 from twilio.rest import Client
+from dotenv import load_dotenv
 from transformers import pipeline
+
 import os
+
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -32,7 +36,7 @@ def webhook():
     message = client.messages.create(
         body=response_msg,
         from_=os.getenv('TWILIO_PHONE_NUMBER'),
-        to=from_number
+        to=os.getenv('WHATSAPP_PHONE_NUMBER')
     )
 
     return jsonify({'status': 'Message sent'}), 200
