@@ -86,7 +86,7 @@ De esta forma, tu proyecto funge como un **puente de comunicación** entre usuar
 
 3. **Exponer tu API con ngrok**  
    ```bash
-   ngrok http 5000
+   ngrok http http://127.0.0.1:5000
    ```
    Copia la URL generada por ngrok (por ejemplo `https://<subdominio>.ngrok.io`) y configúrala en Twilio (o en tu `.env` como `TWILIO_STATUS_CALLBACK_URL`) para que Twilio envíe los mensajes a `https://<subdominio>.ngrok.io/webhook`.
 
