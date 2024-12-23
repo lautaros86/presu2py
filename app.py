@@ -1,19 +1,21 @@
 from flask import Flask, request, jsonify
-from twilio.rest import Client
+from twilio.rest import Client as TwilioClient
 from dotenv import load_dotenv
-from transformers import pipeline
+from ollama import ChatResponse, Client as OllamaClient
 
 import os
 
 load_dotenv()
-
 app = Flask(__name__)
 
 # Configuración de Twilio
-client = Client(os.getenv('TWILIO_ACCOUNT_SID'), os.getenv('TWILIO_AUTH_TOKEN'))
+twilioClient = TwilioClient(os.getenv('TWILIO_ACCOUNT_SID'), os.getenv('TWILIO_AUTH_TOKEN'))
 
-# Cargar el modelo de Hugging Face
-generator = pipeline('text-classification')  # O usa 'EleutherAI/gpt-neo-1.3B' para otro modelo
+# Configuración de Ollama
+oLlamaClient = OllamaClient(
+  host='http://localhost:11434',
+  headers={'x-some-header': 'some-value'}
+)
 
 @app.route("/webhook", methods=['POST'])
 def webhook():
@@ -23,17 +25,22 @@ def webhook():
 
     # Generar una respuesta usando el modelo de Hugging Face
     try:
-        # Usar el modelo de Hugging Face para generar una respuesta
-        response = generator(incoming_msg, max_length=150, num_return_sequences=1)
-
+        # Usar el modelo de llama para generar una respuesta
+        response: ChatResponse = oLlamaClient.chat(model='llama3.2', messages=[
+          {
+            'role': 'user',
+            'content': incoming_msg + "responde en menos de 1000 caracteres",
+          },
+        ])
         # Obtener el texto generado
-        response_msg = response[0]['generated_text'].strip()
+        response_msg = response.message.content
+
 
     except Exception as e:
         response_msg = "Sorry, something went wrong with the AI service."
 
     # Enviar la respuesta a través de Twilio
-    message = client.messages.create(
+    message = twilioClient.messages.create(
         body=response_msg,
         from_=os.getenv('TWILIO_PHONE_NUMBER'),
         to=os.getenv('WHATSAPP_PHONE_NUMBER')
